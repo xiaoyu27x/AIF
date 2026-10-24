@@ -1,0 +1,35 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+local.properties
+*.keystore
+*.jks
+*.p12
+
+# Runtime data and user uploads
+backend/data/
+backend/static/avatar-*
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Android / Gradle
+.gradle/
+**/build/
+.idea/
+*.iml
+.toolchain/
+
+# Bundles and operating-system files
+*.apk
+*.aab
+*.zip
+.DS_Store
+Thumbs.db

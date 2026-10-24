@@ -1,0 +1,31 @@
+dialog label {
+  display: block;
+  margin: 14px 0 6px;
+  color: #eaddea;
+}
+
+dialog select {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  color: #fff;
+  background: #ffffff12;
+  border: 1px solid #ffffff28;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+dialog select option {
+  color: #fff;
+  background: #2b213a;
+}
+
+/* The prompt preview must never expand the chat header. */
+.chat-panel header #description {
+  display: block !important;
+  height: 74px !important;
+  min-height: 74px !important;
+  max-height: 74px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}

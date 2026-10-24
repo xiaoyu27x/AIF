@@ -1,0 +1,15 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:gravity="center" android:padding="28dp" android:background="@color/ink" android:layout_width="match_parent" android:layout_height="match_parent">
+  <TextView android:text="张韵" android:textColor="@color/white" android:textSize="38sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+  <TextView android:text="今天忙不忙？" android:textColor="#E5BDE1" android:textSize="17sp" android:layout_marginBottom="24dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+  <Button android:id="@+id/savedServers" android:text="已保存服务器 ▾" android:textColor="@color/white" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  <EditText android:id="@+id/server" android:hint="服务器地址，例如 http://192.168.1.20:8008" android:inputType="textUri" android:textColor="@color/white" android:textColorHint="#CBBFD1" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  <EditText android:id="@+id/username" android:hint="邮箱或用户名" android:layout_marginTop="10dp" android:textColor="@color/white" android:textColorHint="#CBBFD1" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  <EditText android:id="@+id/password" android:hint="密码" android:inputType="textPassword" android:layout_marginTop="10dp" android:textColor="@color/white" android:textColorHint="#CBBFD1" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  <TextView android:text="本次登录使用" android:textColor="#E5BDE1" android:textSize="15sp" android:layout_marginTop="14dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  <RadioGroup android:id="@+id/modelProvider" android:orientation="horizontal" android:checkedButton="@+id/ollamaModel" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <RadioButton android:id="@+id/ollamaModel" android:text="本地千问" android:textColor="@color/white" android:buttonTint="#E6A7C6" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+    <RadioButton android:id="@+id/openaiModel" android:text="ChatGPT" android:textColor="@color/white" android:buttonTint="#E6A7C6" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+  </RadioGroup>
+  <Button android:id="@+id/login" android:text="开始聊天" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  <TextView android:id="@+id/error" android:textColor="#FFBBC0" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</LinearLayout>

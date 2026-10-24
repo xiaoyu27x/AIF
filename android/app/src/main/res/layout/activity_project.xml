@@ -1,0 +1,9 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/ink" android:padding="20dp" android:layout_width="match_parent" android:layout_height="match_parent">
+  <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <TextView android:text="项目控制" android:textColor="@color/white" android:textSize="28sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/status" android:textColor="@color/white" android:textSize="17sp" android:lineSpacingExtra="5dp" android:paddingTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <Button android:id="@+id/refresh" android:text="刷新进度" android:layout_marginTop="14dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="权限审批" android:textColor="@color/white" android:textSize="21sp" android:textStyle="bold" android:layout_marginTop="24dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <LinearLayout android:id="@+id/approvals" android:orientation="vertical" android:paddingTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  </LinearLayout>
+</ScrollView>

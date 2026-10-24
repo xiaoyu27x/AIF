@@ -1,0 +1,39 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/ink" android:fillViewport="true">
+  <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+    <TextView android:id="@+id/updated" android:visibility="gone" android:layout_width="0dp" android:layout_height="0dp"/>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+      <TextView android:id="@+id/base_select" android:text="基准币种：CNY" android:textColor="@color/white" android:textSize="15sp" android:background="@color/panel" android:padding="14dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+      <TextView android:id="@+id/quote_select" android:text="兑换币种：AUD" android:textColor="@color/white" android:textSize="15sp" android:background="@color/panel" android:padding="14dp" android:layout_marginStart="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+      <TextView android:id="@+id/rate_type" android:text="市场牌价" android:textColor="@color/white" android:textSize="15sp" android:background="@color/panel" android:padding="14dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
+      <TextView android:id="@+id/settlement_type" android:text="现汇" android:textColor="@color/white" android:textSize="15sp" android:background="@color/panel" android:paddingStart="12dp" android:paddingEnd="12dp" android:paddingTop="14dp" android:paddingBottom="14dp" android:layout_marginStart="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+      <Button android:id="@+id/refresh" android:text="刷新" android:textSize="12sp" android:minWidth="0dp" android:minHeight="0dp" android:paddingStart="12dp" android:paddingEnd="12dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:textColor="@color/ink" android:backgroundTint="@color/pink" android:layout_marginStart="8dp" android:layout_gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <TextView android:id="@+id/summary" android:textColor="@color/white" android:textSize="17sp" android:lineSpacingExtra="4dp" android:background="@color/panel" android:padding="18dp" android:layout_marginTop="20dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/pair_title" android:text="CNY / AUD" android:textColor="@color/white" android:textSize="21sp" android:textStyle="bold" android:layout_marginTop="28dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/pair_subtitle" android:visibility="gone" android:layout_width="0dp" android:layout_height="0dp"/>
+    <RadioGroup android:id="@+id/chart_mode" android:orientation="horizontal" android:layout_marginTop="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
+      <RadioButton android:id="@+id/mode_candle" android:text="K 线" android:textColor="@color/white" android:buttonTint="@color/pink" android:checked="true" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+      <RadioButton android:id="@+id/mode_trend" android:text="走势对比" android:textColor="@color/white" android:buttonTint="@color/pink" android:layout_marginStart="18dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    </RadioGroup>
+    <TextView android:id="@+id/trend_select" android:text="对比币种：AUD、USD" android:textColor="@color/white" android:textSize="14sp" android:background="@color/panel" android:padding="12dp" android:layout_marginTop="8dp" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none" android:layout_marginTop="15dp">
+      <RadioGroup android:id="@+id/range_group" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <RadioButton android:id="@+id/range_1d" android:text="1天" android:textColor="@color/white" android:buttonTint="@color/pink" android:checked="true" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/range_3d" android:text="3天" android:textColor="@color/white" android:buttonTint="@color/pink" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/range_7d" android:text="7天" android:textColor="@color/white" android:buttonTint="@color/pink" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/range_1m" android:text="1个月" android:textColor="@color/white" android:buttonTint="@color/pink" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/range_3m" android:text="3个月" android:textColor="@color/white" android:buttonTint="@color/pink" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/range_6m" android:text="半年" android:textColor="@color/white" android:buttonTint="@color/pink" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/range_1y" android:text="1年" android:textColor="@color/white" android:buttonTint="@color/pink" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/range_2y" android:text="2年" android:textColor="@color/white" android:buttonTint="@color/pink" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+      </RadioGroup>
+    </HorizontalScrollView>
+    <com.zy.zhangyun.CandleChartView android:id="@+id/chart" android:layout_width="match_parent" android:layout_height="290dp" android:layout_marginTop="10dp"/>
+    <com.zy.zhangyun.TrendChartView android:id="@+id/trend_chart" android:visibility="gone" android:layout_width="match_parent" android:layout_height="290dp" android:layout_marginTop="10dp"/>
+    <TextView android:id="@+id/chart_info" android:text="加载历史数据…" android:textColor="@color/muted" android:textSize="13sp" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/data_note" android:text="数据说明：市场牌价来自公开外汇参考价；非银行实际成交价，仅供参考。" android:textColor="@color/muted" android:textSize="12sp" android:lineSpacingExtra="3dp" android:layout_marginTop="24dp" android:layout_marginBottom="20dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  </LinearLayout>
+</ScrollView>

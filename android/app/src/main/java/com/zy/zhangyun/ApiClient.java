@@ -1,0 +1,41 @@
+package com.zy.zhangyun;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import java.io.*; import java.net.*; import java.nio.charset.StandardCharsets; import java.security.*; import java.util.*; import javax.crypto.*; import javax.crypto.spec.GCMParameterSpec; import android.security.keystore.*; import android.util.Base64; import org.json.*;
+
+public class ApiClient {
+  // This is useful for the Android emulator. On a phone, enter your own server
+  // URL on the login screen; the exact URL entered is kept unchanged.
+  private static final String DEFAULT_BASE = "http://10.0.2.2:8008";
+  private final SharedPreferences prefs;
+  private volatile HttpURLConnection eventConnection;
+  public ApiClient(Context c){ prefs=c.getSharedPreferences("zhangyun", Context.MODE_PRIVATE); }
+  private String normalizeBase(String value){
+    String normalized=(value==null?"":value.trim()).replaceAll("/$","");
+    if(!normalized.matches("^https?://.*")) normalized="http://"+normalized;
+    return normalized;
+  }
+  public String base(){ return normalizeBase(prefs.getString("base", DEFAULT_BASE)); }
+  public void setBase(String value){ prefs.edit().putString("base",normalizeBase(value)).apply(); }
+  private String connectionBase(){ return base(); }
+  private SecretKey key() throws Exception { KeyStore ks=KeyStore.getInstance("AndroidKeyStore");ks.load(null);if(!ks.containsAlias("ai_girlfriend_login")){KeyGenerator g=KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,"AndroidKeyStore");g.init(new KeyGenParameterSpec.Builder("ai_girlfriend_login",KeyProperties.PURPOSE_ENCRYPT|KeyProperties.PURPOSE_DECRYPT).setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).build());g.generateKey();}return ((KeyStore.SecretKeyEntry)ks.getEntry("ai_girlfriend_login",null)).getSecretKey(); }
+  private String protect(String value) throws Exception { Cipher c=Cipher.getInstance("AES/GCM/NoPadding");c.init(Cipher.ENCRYPT_MODE,key());return Base64.encodeToString(c.getIV(),Base64.NO_WRAP)+":"+Base64.encodeToString(c.doFinal(value.getBytes(StandardCharsets.UTF_8)),Base64.NO_WRAP); }
+  private String reveal(String value) { try{String[] p=value.split(":",2);Cipher c=Cipher.getInstance("AES/GCM/NoPadding");c.init(Cipher.DECRYPT_MODE,key(),new GCMParameterSpec(128,Base64.decode(p[0],Base64.NO_WRAP)));return new String(c.doFinal(Base64.decode(p[1],Base64.NO_WRAP)),StandardCharsets.UTF_8);}catch(Exception e){return "";} }
+  public void saveCredentials(String user,String password){try{prefs.edit().putString("saved_user",protect(user)).putString("saved_pass",protect(password)).apply();}catch(Exception ignored){}}
+  public String savedUser(){return reveal(prefs.getString("saved_user", ""));}
+  public String savedPassword(){return reveal(prefs.getString("saved_pass", ""));}
+  private HttpURLConnection open(String path, String method) throws Exception { HttpURLConnection c=(HttpURLConnection)new URL(connectionBase()+path).openConnection(); c.setRequestMethod(method); c.setConnectTimeout(15000); c.setReadTimeout(480000); String cookie=prefs.getString("cookie",""); if(!cookie.isEmpty())c.setRequestProperty("Cookie",cookie); return c; }
+  private String text(InputStream in) throws Exception { try(BufferedReader r=new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))){StringBuilder b=new StringBuilder();String l;while((l=r.readLine())!=null)b.append(l);return b.toString();} }
+  public static class ServerProfile { public final String base,user,password,cookie; ServerProfile(String b,String u,String p,String c){base=b;user=u;password=p;cookie=c;} public String label(){return base.replaceFirst("^https?://","");} }
+  public List<ServerProfile> serverProfiles(){ ArrayList<ServerProfile> result=new ArrayList<>(); try{JSONArray rows=new JSONArray(prefs.getString("server_profiles","[]"));for(int i=0;i<rows.length();i++){JSONObject row=rows.getJSONObject(i);result.add(new ServerProfile(normalizeBase(row.getString("base")),reveal(row.optString("user")),reveal(row.optString("password")),reveal(row.optString("cookie"))));}}catch(Exception ignored){} if(result.isEmpty()&&!savedUser().isEmpty())result.add(new ServerProfile(base(),savedUser(),savedPassword(),prefs.getString("cookie",""))); return result; }
+  public void activateServer(ServerProfile profile){setBase(profile.base);prefs.edit().putString("cookie",profile.cookie).apply();}
+  private void rememberServer(String user,String password,String cookie){try{ArrayList<ServerProfile> entries=new ArrayList<>(serverProfiles());String current=base();for(int i=entries.size()-1;i>=0;i--)if(entries.get(i).base.equals(current))entries.remove(i);entries.add(0,new ServerProfile(current,user,password,cookie));JSONArray rows=new JSONArray();for(ServerProfile p:entries){JSONObject row=new JSONObject();row.put("base",p.base);row.put("user",protect(p.user));row.put("password",protect(p.password));row.put("cookie",protect(p.cookie));rows.put(row);}prefs.edit().putString("server_profiles",rows.toString()).apply();}catch(Exception ignored){}}
+  public boolean login(String user,String pass,String provider) throws Exception { HttpURLConnection c=open("/api/login","POST"); c.setDoOutput(true); c.setRequestProperty("Content-Type","application/x-www-form-urlencoded"); try(OutputStream o=c.getOutputStream()){o.write(("username="+URLEncoder.encode(user,"UTF-8")+"&password="+URLEncoder.encode(pass,"UTF-8")+"&model_provider="+URLEncoder.encode(provider,"UTF-8")).getBytes(StandardCharsets.UTF_8));} if(c.getResponseCode()!=200)return false; String cookie=c.getHeaderField("Set-Cookie"); if(cookie!=null)cookie=cookie.split(";",2)[0];else cookie="";prefs.edit().putString("cookie",cookie).apply(); saveCredentials(user,pass); rememberServer(user,pass,cookie); return true; }
+  public String get(String path) throws Exception { HttpURLConnection c=open(path,"GET"); int code=c.getResponseCode(); return text(code<400?c.getInputStream():c.getErrorStream()); }
+  public BufferedReader eventStream() throws Exception { HttpURLConnection c=(HttpURLConnection)new URL(connectionBase()+"/api/events").openConnection();c.setRequestMethod("GET");c.setConnectTimeout(15000);c.setReadTimeout(0);c.setRequestProperty("Accept","text/event-stream");String cookie=prefs.getString("cookie","");if(!cookie.isEmpty())c.setRequestProperty("Cookie",cookie);eventConnection=c;return new BufferedReader(new InputStreamReader(c.getInputStream(),StandardCharsets.UTF_8)); }
+  public void closeEvents(){HttpURLConnection c=eventConnection;if(c!=null)c.disconnect();eventConnection=null;}
+  public String chat(String message,int personaId) throws Exception { HttpURLConnection c=open("/api/chat","POST"); c.setDoOutput(true); c.setRequestProperty("Content-Type","application/x-www-form-urlencoded"); try(OutputStream o=c.getOutputStream()){o.write(("message="+URLEncoder.encode(message,"UTF-8")+"&persona_id="+personaId).getBytes(StandardCharsets.UTF_8));} int code=c.getResponseCode(); return text(code<400?c.getInputStream():c.getErrorStream()); }
+  public String post(String path,String body) throws Exception { HttpURLConnection c=open(path,"POST");c.setDoOutput(true);c.setRequestProperty("Content-Type","application/x-www-form-urlencoded");try(OutputStream o=c.getOutputStream()){o.write(body.getBytes(StandardCharsets.UTF_8));}int code=c.getResponseCode();return text(code<400?c.getInputStream():c.getErrorStream()); }
+  public String upload(File file,String type,int personaId) throws Exception { String b="----ZhangYun"+System.currentTimeMillis(); HttpURLConnection c=open("/api/avatar","POST");c.setDoOutput(true);c.setRequestProperty("Content-Type","multipart/form-data; boundary="+b); try(OutputStream o=c.getOutputStream();FileInputStream in=new FileInputStream(file)){o.write(("--"+b+"\r\nContent-Disposition: form-data; name=\"persona_id\"\r\n\r\n"+personaId+"\r\n").getBytes());o.write(("--"+b+"\r\nContent-Disposition: form-data; name=\"image\"; filename=\"avatar\"\r\nContent-Type: "+type+"\r\n\r\n").getBytes());byte[] buf=new byte[8192];int n;while((n=in.read(buf))>0)o.write(buf,0,n);o.write(("\r\n--"+b+"--\r\n").getBytes());}return text(c.getResponseCode()<400?c.getInputStream():c.getErrorStream()); }
+}
